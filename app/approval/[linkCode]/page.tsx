@@ -1,13 +1,35 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import ApprovalTable from '@/components/ApprovalTable';
 import { EvaluationRecord } from '@/lib/types';
 
+interface ApproverInfo {
+  FullnameTH?: string;
+  MainPositionOrgShort?: string;
+  ApproveStatus?: number;
+  ApproveDate?: string;
+}
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '-';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('th-TH', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return dateString;
+  }
+};
+
 export default function ApprovalPage() {
   const params = useParams();
-  const router = useRouter();
   const linkCode = params.linkCode as string;
   
   const [records, setRecords] = useState<EvaluationRecord[]>([]);
@@ -15,12 +37,41 @@ export default function ApprovalPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [approverInfo, setApproverInfo] = useState<ApproverInfo | null>(null);
 
   useEffect(() => {
     if (linkCode) {
       loadData();
+      loadApproverInfo();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkCode]);
+
+  const loadApproverInfo = async () => {
+    try {
+      const response = await fetch('/api/eva/get-approval-link-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          linkCode: linkCode,
+        }),
+      });
+
+      const result = await response.json();
+      console.log('Approver info response:', result);
+
+      // API returns array, get first item
+      if (Array.isArray(result) && result.length > 0) {
+        setApproverInfo(result[0]);
+      } else if (result && !Array.isArray(result) && result.success !== false) {
+        setApproverInfo(result);
+      }
+    } catch (error) {
+      console.error('Error loading approver info:', error);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -86,7 +137,8 @@ export default function ApprovalPage() {
 
       if (response.ok && data.success !== false) {
         setSuccess(`${actionText}เรียบร้อยแล้ว`);
-        // Optionally reload data or redirect
+        // Reload approver info to update status
+        loadApproverInfo();
       } else {
         setError(data.message || `เกิดข้อผิดพลาดในการ${actionText}`);
       }
@@ -99,64 +151,150 @@ export default function ApprovalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="w-[90%] mx-auto py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Subtle grid pattern overlay */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(148%2C163%2C184%2C0.05)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')] pointer-events-none"></div>
+      
+      <div className="relative w-full px-4 sm:px-6 md:w-[95%] lg:w-[90%] xl:max-w-6xl mx-auto py-8 md:py-12">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            รายการผู้ประเมิน (สำหรับอนุมัติ)
+        <div className="mb-8 md:mb-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-4">
+            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+            <span className="text-xs font-medium text-cyan-400 tracking-wide uppercase">Approval Portal</span>
+          </div>
+          <h1 className="text-2xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+            รายการผู้ประเมิน
           </h1>
-          <p className="text-gray-600">
-            รหัสอนุมัติ: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{linkCode}</span>
-          </p>
+          {approverInfo && (
+            <div className="text-slate-400 text-sm md:text-base">
+              <span className="text-white font-medium">{approverInfo.FullnameTH}</span>
+              {approverInfo.MainPositionOrgShort && (
+                <span className="ml-2 text-slate-500">({approverInfo.MainPositionOrgShort})</span>
+              )}
+              {/* Status Badge */}
+              {approverInfo.ApproveStatus === 1 && (
+                <div className="mt-3">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                    <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-emerald-400 font-medium">อนุมัติแล้ว</span>
+                    <span className="text-emerald-400/70 text-xs">({formatDate(approverInfo.ApproveDate)})</span>
+                  </span>
+                </div>
+              )}
+              {approverInfo.ApproveStatus === 2 && (
+                <div className="mt-3">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/30">
+                    <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span className="text-rose-400 font-medium">ไม่อนุมัติ</span>
+                    <span className="text-rose-400/70 text-xs">({formatDate(approverInfo.ApproveDate)})</span>
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800">{error}</p>
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <p className="text-red-300">{error}</p>
+            </div>
           </div>
         )}
 
         {/* Success Message */}
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-800">{success}</p>
+          <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-emerald-300">{success}</p>
+            </div>
           </div>
         )}
 
-        {/* Content */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          {loading ? (
-            <div className="py-12 text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-gray-600">กำลังโหลดข้อมูล...</p>
-            </div>
-          ) : (
-            <>
-              <ApprovalTable records={records} />
-
-              {/* Approval Buttons */}
-              {records.length > 0 && !success && (
-                <div className="mt-6 flex justify-center gap-4">
-                  <button
-                    onClick={() => handleApproval(1)}
-                    disabled={submitting}
-                    className="px-8 py-3 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {submitting ? 'กำลังดำเนินการ...' : 'อนุมัติ'}
-                  </button>
-                  <button
-                    onClick={() => handleApproval(2)}
-                    disabled={submitting}
-                    className="px-8 py-3 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {submitting ? 'กำลังดำเนินการ...' : 'ไม่อนุมัติ'}
-                  </button>
+        {/* Content Card */}
+        <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden">
+          {/* Card gradient border effect */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+          
+          <div className="p-4 md:p-8">
+            {loading ? (
+              <div className="py-16 text-center">
+                <div className="relative inline-block">
+                  <div className="w-12 h-12 rounded-full border-2 border-slate-700 border-t-cyan-400 animate-spin"></div>
+                  <div className="absolute inset-0 w-12 h-12 rounded-full bg-cyan-400/20 blur-xl"></div>
                 </div>
-              )}
-            </>
-          )}
+                <p className="mt-4 text-slate-400">กำลังโหลดข้อมูล...</p>
+              </div>
+            ) : (
+              <>
+                <ApprovalTable records={records} isSpotlightTheme={true} />
+
+                {/* Approval Buttons */}
+                {records.length > 0 && !success && approverInfo?.ApproveStatus === 0 && (
+                  <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+                    <button
+                      onClick={() => handleApproval(1)}
+                      disabled={submitting}
+                      className="group relative w-full sm:w-auto px-8 py-4 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.1)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')] opacity-50"></div>
+                      <span className="relative flex items-center justify-center gap-2">
+                        {submitting ? 'กำลังดำเนินการ...' : (
+                          <>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            อนุมัติ
+                          </>
+                        )}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => handleApproval(2)}
+                      disabled={submitting}
+                      className="group relative w-full sm:w-auto px-8 py-4 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-rose-500 to-rose-600"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.1)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')] opacity-50"></div>
+                      <span className="relative flex items-center justify-center gap-2">
+                        {submitting ? 'กำลังดำเนินการ...' : (
+                          <>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            ไม่อนุมัติ
+                          </>
+                        )}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-slate-500 text-xs">
+          AOT Evaluator System
         </div>
       </div>
     </div>

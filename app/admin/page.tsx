@@ -3,42 +3,55 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import UserProfile from '@/components/UserProfile';
-import EvaluatorTable from '@/components/EvaluatorTable';
-import EditEvaluatorModal from '@/components/EditEvaluatorModal';
-import SendApprovalModal from '@/components/SendApprovalModal';
-import { Employee, EvaluationRecord } from '@/lib/types';
+import AdminTable from '@/components/AdminTable';
+import { EvaluationRecord } from '@/lib/types';
 import Link from 'next/link';
 import * as XLSX from 'xlsx';
 
-export default function Home() {
-  const { isAuthenticated, user, login, isLoading: authLoading } = useAuth();
+interface AdminOption {
+  EmplCode_Admin: string;
+  FullnameTH_Admin: string;
+}
+
+export default function AdminPage() {
+  const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const [admins, setAdmins] = useState<AdminOption[]>([]);
+  const [selectedAdmin, setSelectedAdmin] = useState<string>('');
   const [records, setRecords] = useState<EvaluationRecord[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
-  const [loadingEmployees, setLoadingEmployees] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<EvaluationRecord | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSendApprovalModalOpen, setIsSendApprovalModalOpen] = useState(false);
-  const [manualEmplCode, setManualEmplCode] = useState('');
-
-  // Get CCTR from first record
-  const cctr = records.length > 0 ? records[0].CCTR || '' : '';
-
-  // Get effective employee ID (from user profile or manual input)
-  const effectiveEmplCode = user?.employeeId || manualEmplCode;
+  const [loadingAdmins, setLoadingAdmins] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
-      loadEmployees();
-      if (user?.employeeId) {
-        loadData(user.employeeId);
-      }
+      loadAdmins();
     }
-  }, [isAuthenticated, user?.employeeId]);
+  }, [isAuthenticated]);
 
-  const loadData = async (emplCode?: string) => {
-    const codeToUse = emplCode || effectiveEmplCode;
-    if (!codeToUse) return;
+  const loadAdmins = async () => {
+    setLoadingAdmins(true);
+    try {
+      const response = await fetch('/api/eva/get-admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        setAdmins(data);
+      } else if (data.data && Array.isArray(data.data)) {
+        setAdmins(data.data);
+      }
+    } catch (error) {
+      console.error('Error loading admins:', error);
+    } finally {
+      setLoadingAdmins(false);
+    }
+  };
+
+  const loadData = async (adminCode: string) => {
+    if (!adminCode) return;
 
     setLoading(true);
     try {
@@ -48,20 +61,16 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          EmplCode: codeToUse,
+          EmplCode: adminCode,
         }),
       });
-
-      const result = await response.json();
-
-      if (Array.isArray(result)) {
-        setRecords(result);
-      } else if (result.success && result.data) {
-        setRecords(result.data);
-      } else if (result.data) {
-        setRecords(Array.isArray(result.data) ? result.data : []);
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        setRecords(data);
+      } else if (data.data && Array.isArray(data.data)) {
+        setRecords(data.data);
       } else {
-        console.error('Failed to load data:', result.message);
         setRecords([]);
       }
     } catch (error) {
@@ -72,63 +81,14 @@ export default function Home() {
     }
   };
 
-  const loadEmployees = async () => {
-    // Check localStorage first
-    const CACHE_KEY = 'employeesCache';
-    const CACHE_EXPIRY_KEY = 'employeesCacheExpiry';
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-    try {
-      const cachedData = localStorage.getItem(CACHE_KEY);
-      const cacheExpiry = localStorage.getItem(CACHE_EXPIRY_KEY);
-      
-      if (cachedData && cacheExpiry && Date.now() < parseInt(cacheExpiry)) {
-        // Use cached data
-        const employees = JSON.parse(cachedData);
-        setEmployees(employees);
-        return;
-      }
-    } catch (error) {
-      console.log('Error reading from localStorage:', error);
+  const handleAdminChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const adminCode = e.target.value;
+    setSelectedAdmin(adminCode);
+    if (adminCode) {
+      loadData(adminCode);
+    } else {
+      setRecords([]);
     }
-
-    // Fetch from API if no cache or cache expired
-    setLoadingEmployees(true);
-    try {
-      const response = await fetch('/api/employees');
-      const data = await response.json();
-
-      let employeeList: Employee[] = [];
-      if (Array.isArray(data)) {
-        employeeList = data;
-      } else if (data.data && Array.isArray(data.data)) {
-        employeeList = data.data;
-      }
-
-      setEmployees(employeeList);
-
-      // Save to localStorage
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(employeeList));
-        localStorage.setItem(CACHE_EXPIRY_KEY, (Date.now() + CACHE_DURATION).toString());
-      } catch (error) {
-        console.log('Error saving to localStorage:', error);
-      }
-    } catch (error) {
-      console.error('Error loading employees:', error);
-      setEmployees([]);
-    } finally {
-      setLoadingEmployees(false);
-    }
-  };
-
-  const handleEdit = (record: EvaluationRecord) => {
-    setSelectedRecord(record);
-    setIsModalOpen(true);
-  };
-
-  const handleSave = () => {
-    loadData(); // Reload data after save
   };
 
   const exportToExcel = () => {
@@ -150,9 +110,9 @@ export default function Home() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'รายชื่อผู้ประเมิน');
 
-    // Generate filename with date
+    // Generate filename with date and admin code
     const date = new Date().toISOString().split('T')[0];
-    XLSX.writeFile(workbook, `รายชื่อผู้ประเมิน_${date}.xlsx`);
+    XLSX.writeFile(workbook, `ตรวจสอบข้อมูล_${selectedAdmin}_${date}.xlsx`);
   };
 
   // Show loading while checking auth
@@ -181,7 +141,7 @@ export default function Home() {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
           
           <div className="mb-6">
-            <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-gradient-to-br from-cyan-500 to-cyan-600">
+            <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-600">
               <svg
                 className="w-10 h-10 text-white"
                 fill="none"
@@ -192,13 +152,13 @@ export default function Home() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
             </div>
           </div>
           <h1 className="text-2xl font-bold mb-2 text-white">
-            กำหนดรายชื่อผู้ประเมิน
+            ตรวจสอบข้อมูล
           </h1>
           <p className="mb-6 text-slate-400">
             กรุณาเข้าสู่ระบบด้วย Azure Entra ID
@@ -235,51 +195,48 @@ export default function Home() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-4">
-                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-                <span className="text-xs font-medium text-cyan-400 tracking-wide uppercase">Evaluator System</span>
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                <span className="text-xs font-medium text-emerald-400 tracking-wide uppercase">Admin Portal</span>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                กำหนดรายชื่อผู้ประเมิน
+                ตรวจสอบข้อมูล
               </h1>
             </div>
             <Link
-              href="/admin"
+              href="/"
               className="group relative px-6 py-3 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <span className="relative">ตรวจสอบข้อมูล</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-600 to-slate-700"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-500 to-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="relative">กลับหน้าหลัก</span>
             </Link>
           </div>
           <UserProfile isSpotlightTheme={true} />
         </div>
 
-        {/* Warning and manual input if no employeeId */}
-        {!user?.employeeId && (
-          <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-sm">
-            <p className="text-amber-300 mb-3">
-              <strong>คำเตือน:</strong> ไม่พบรหัสพนักงาน (Employee ID) ในโปรไฟล์ของคุณ 
-              กรุณาติดต่อผู้ดูแลระบบเพื่อเพิ่มข้อมูล Employee ID ใน Azure AD
-            </p>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                placeholder="กรอกรหัสพนักงาน (เช่น 23512)"
-                value={manualEmplCode}
-                onChange={(e) => setManualEmplCode(e.target.value)}
-                className="flex-1 max-w-xs px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
-              />
-              <button
-                onClick={() => loadData(manualEmplCode)}
-                disabled={!manualEmplCode || loading}
-                className="group relative px-6 py-2.5 font-medium text-white rounded-lg overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600"></div>
-                <span className="relative">ค้นหา</span>
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Admin Dropdown Card */}
+        <div className="mb-6 p-6 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
+          <label className="block text-sm font-medium mb-3 text-slate-300">
+            เลือกรหัสธุรการ
+          </label>
+          <select
+            value={selectedAdmin}
+            onChange={handleAdminChange}
+            disabled={loadingAdmins}
+            className="w-full max-w-md px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/50 disabled:opacity-50"
+            style={{ colorScheme: 'dark' }}
+          >
+            <option value="" className="bg-slate-800 text-white">-- เลือกรหัสธุรการ --</option>
+            {admins.map((admin) => (
+              <option key={admin.EmplCode_Admin} value={admin.EmplCode_Admin} className="bg-slate-800 text-white">
+                {admin.EmplCode_Admin} - {admin.FullnameTH_Admin}
+              </option>
+            ))}
+          </select>
+          {loadingAdmins && (
+            <p className="mt-2 text-sm text-slate-400">กำลังโหลดรายการธุรการ...</p>
+          )}
+        </div>
 
         {/* Content Card */}
         <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden">
@@ -289,25 +246,10 @@ export default function Home() {
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold text-white">รายการผู้ประเมิน</h2>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => loadData()}
-                  disabled={loading || !effectiveEmplCode}
-                  className="group relative px-4 py-2 font-medium text-white rounded-lg overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-cyan-600"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <span className="relative">{loading ? 'กำลังโหลด...' : 'รีเฟรชข้อมูล'}</span>
-                </button>
-                <button
-                  onClick={() => setIsSendApprovalModalOpen(true)}
-                  disabled={loading || records.length === 0 || !effectiveEmplCode}
-                  className="group relative px-4 py-2 font-medium text-white rounded-lg overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <span className="relative">ส่งอนุมัติ</span>
-                </button>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-slate-400">
+                  ทั้งหมด {records.length} รายการ
+                </span>
                 <button
                   onClick={exportToExcel}
                   disabled={loading || records.length === 0}
@@ -319,7 +261,7 @@ export default function Home() {
                 </button>
               </div>
             </div>
-
+            
             {loading ? (
               <div className="py-16 text-center">
                 <div className="relative inline-block">
@@ -328,8 +270,12 @@ export default function Home() {
                 </div>
                 <p className="mt-4 text-slate-400">กำลังโหลดข้อมูล...</p>
               </div>
+            ) : !selectedAdmin ? (
+              <div className="text-center py-16 text-slate-500">
+                กรุณาเลือกรหัสธุรการเพื่อดูข้อมูล
+              </div>
             ) : (
-              <EvaluatorTable records={records} onEdit={handleEdit} isSpotlightTheme={true} />
+              <AdminTable records={records} isSpotlightTheme={true} />
             )}
           </div>
         </div>
@@ -339,29 +285,6 @@ export default function Home() {
           AOT Evaluator System
         </div>
       </div>
-
-      {/* Edit Modal */}
-      {selectedRecord && (
-        <EditEvaluatorModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          record={selectedRecord}
-          employees={employees}
-          employeeId={effectiveEmplCode}
-          onSave={handleSave}
-        />
-      )}
-
-      {/* Send Approval Modal */}
-      <SendApprovalModal
-        isOpen={isSendApprovalModalOpen}
-        onClose={() => setIsSendApprovalModalOpen(false)}
-        employees={employees}
-        employeeId={effectiveEmplCode}
-        cctr={cctr}
-        onSuccess={() => loadData()}
-        isLoadingEmployees={loadingEmployees}
-      />
     </div>
   );
 }

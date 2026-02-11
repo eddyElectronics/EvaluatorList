@@ -3,15 +3,14 @@
 import { useState, useMemo } from 'react';
 import { EvaluationRecord } from '@/lib/types';
 
-interface EvaluatorTableProps {
+interface AdminTableProps {
   records: EvaluationRecord[];
-  onEdit: (record: EvaluationRecord) => void;
   isSpotlightTheme?: boolean;
 }
 
 type SortDirection = 'asc' | 'desc' | null;
 
-export default function EvaluatorTable({ records, onEdit, isSpotlightTheme = false }: EvaluatorTableProps) {
+export default function AdminTable({ records, isSpotlightTheme = false }: AdminTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   const formatDate = (dateString?: string) => {
@@ -85,7 +84,6 @@ export default function EvaluatorTable({ records, onEdit, isSpotlightTheme = fal
             <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้ประเมิน 1</th>
             <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้ประเมิน 2</th>
             <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้ประเมิน 3</th>
-            <th className={`text-center ${isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}`}>จัดการ</th>
             <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้บันทึก</th>
             <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>เวลาบันทึก</th>
           </tr>
@@ -93,7 +91,7 @@ export default function EvaluatorTable({ records, onEdit, isSpotlightTheme = fal
         <tbody>
           {sortedRecords.length === 0 ? (
             <tr>
-              <td colSpan={10} className={`text-center py-8 ${isSpotlightTheme ? 'text-slate-500' : 'text-[var(--foreground-muted)]'}`}>
+              <td colSpan={9} className={`text-center py-8 ${isSpotlightTheme ? 'text-slate-500' : 'text-[var(--foreground-muted)]'}`}>
                 ไม่พบข้อมูล
               </td>
             </tr>
@@ -126,24 +124,6 @@ export default function EvaluatorTable({ records, onEdit, isSpotlightTheme = fal
                 </td>
                 <td className={isSpotlightTheme ? 'px-4 py-4 text-slate-500' : ''}>
                   {record.FullnameTH3 || '-'}
-                </td>
-                <td className="text-center">
-                  {isSpotlightTheme ? (
-                    <button
-                      onClick={() => onEdit(record)}
-                      className="px-3 py-1.5 text-xs font-medium text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 rounded-lg hover:bg-cyan-500/20 transition-colors"
-                    >
-                      แก้ไข
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => onEdit(record)}
-                      className="btn btn-primary"
-                      style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}
-                    >
-                      แก้ไข
-                    </button>
-                  )}
                 </td>
                 <td className={isSpotlightTheme ? 'px-4 py-4 text-slate-300' : ''}>
                   {record.EmplCode_AdminUpdateTH || '-'}

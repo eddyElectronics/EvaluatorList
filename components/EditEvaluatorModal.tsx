@@ -76,29 +76,30 @@ export default function EditEvaluatorModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">แก้ไขผู้ประเมิน</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4" style={{ borderRadius: '1rem' }}>
+        <div className="px-6 py-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--foreground)' }}>แก้ไขผู้ประเมิน</h2>
         </div>
 
         <div className="px-6 py-4 space-y-4">
           {/* ผู้ถูกประเมิน */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
               ผู้ถูกประเมิน
             </label>
             <input
               type="text"
               value={record.FullnameTHEmpl}
               disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+              className="w-full px-3 py-2 rounded-lg"
+              style={{ background: '#f8fafc', border: '1px solid var(--border-color)', color: 'var(--foreground-muted)' }}
             />
           </div>
 
           {/* ผู้ประเมิน 1 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
               ผู้ประเมิน 1
             </label>
             <EmployeeAutocomplete
@@ -111,7 +112,7 @@ export default function EditEvaluatorModal({
 
           {/* ผู้ประเมิน 2 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
               ผู้ประเมิน 2
             </label>
             <EmployeeAutocomplete
@@ -124,7 +125,7 @@ export default function EditEvaluatorModal({
 
           {/* ผู้ประเมิน 3 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
               ผู้ประเมิน 3
             </label>
             <EmployeeAutocomplete
@@ -136,18 +137,19 @@ export default function EditEvaluatorModal({
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+        <div className="px-6 py-4 flex justify-end space-x-3" style={{ borderTop: '1px solid var(--border-color)' }}>
           <button
             onClick={onClose}
             disabled={isSaving}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="btn"
+            style={{ background: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border-color)' }}
           >
             ปิด
           </button>
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="btn btn-primary"
           >
             {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
           </button>
