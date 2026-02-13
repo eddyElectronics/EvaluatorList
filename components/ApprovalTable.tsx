@@ -5,12 +5,11 @@ import { EvaluationRecord } from '@/lib/types';
 
 interface ApprovalTableProps {
   records: EvaluationRecord[];
-  isSpotlightTheme?: boolean;
 }
 
 type SortDirection = 'asc' | 'desc' | null;
 
-export default function ApprovalTable({ records, isSpotlightTheme = false }: ApprovalTableProps) {
+export default function ApprovalTable({ records }: ApprovalTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   const formatDate = (dateString?: string) => {
@@ -55,43 +54,40 @@ export default function ApprovalTable({ records, isSpotlightTheme = false }: App
   };
 
   const getSortIcon = () => {
-    if (sortDirection === 'asc') {
-      return '↑';
-    } else if (sortDirection === 'desc') {
-      return '↓';
-    }
+    if (sortDirection === 'asc') return '↑';
+    if (sortDirection === 'desc') return '↓';
     return '↕';
   };
 
   return (
-    <div className={`overflow-x-auto rounded-xl -mx-3 md:mx-0 ${isSpotlightTheme ? '' : 'border border-[var(--border-color)]'}`}>
+    <div className="overflow-x-auto rounded-xl -mx-3 md:mx-0">
       {/* Desktop Table */}
-      <table className={`hidden md:table w-full ${isSpotlightTheme ? 'spotlight-table' : 'table-larkon'}`}>
+      <table className="hidden md:table w-full">
         <thead>
-          <tr className={isSpotlightTheme ? 'border-b border-white/10' : ''}>
-            <th className={`text-center ${isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}`} style={{ width: '60px' }}>ลำดับ</th>
+          <tr style={{ borderBottom: '1px solid var(--table-border)' }}>
+            <th className="text-center px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ width: '60px', color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ลำดับ</th>
             <th 
-              className={`cursor-pointer select-none ${isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}`}
+              className="cursor-pointer select-none px-4 py-4 text-xs font-semibold uppercase tracking-wider"
               onClick={handleSort}
-              style={{ minWidth: '150px' }}
+              style={{ minWidth: '150px', color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}
             >
               <div className="flex items-center gap-2">
                 ผู้ถูกประเมิน
-                <span className={isSpotlightTheme ? 'text-cyan-400' : 'text-[var(--foreground-muted)]'}>{getSortIcon()}</span>
+                <span style={{ color: 'var(--accent)' }}>{getSortIcon()}</span>
               </div>
             </th>
-            <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>หน่วยงาน</th>
-            <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้ประเมิน 1</th>
-            <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้ประเมิน 2</th>
-            <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้ประเมิน 3</th>
-            <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>ผู้บันทึก</th>
-            <th className={isSpotlightTheme ? 'px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-white/[0.02]' : ''}>เวลาบันทึก</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>หน่วยงาน</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้ประเมิน 1</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้ประเมิน 2</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้ประเมิน 3</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้บันทึก</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>เวลาบันทึก</th>
           </tr>
         </thead>
         <tbody>
           {sortedRecords.length === 0 ? (
             <tr>
-              <td colSpan={8} className={`text-center py-8 ${isSpotlightTheme ? 'text-slate-500' : 'text-[var(--foreground-muted)]'}`}>
+              <td colSpan={8} className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
                 ไม่พบข้อมูล
               </td>
             </tr>
@@ -99,19 +95,20 @@ export default function ApprovalTable({ records, isSpotlightTheme = false }: App
             sortedRecords.map((record, index) => (
               <tr 
                 key={record.id || index}
-                className={isSpotlightTheme 
-                  ? `border-b border-white/5 hover:bg-white/[0.04] transition-colors ${index % 2 === 0 ? 'bg-white/[0.01]' : 'bg-transparent'}` 
-                  : ''
-                }
+                className="transition-colors"
+                style={{ 
+                  borderBottom: '1px solid var(--table-border)',
+                  background: index % 2 === 0 ? 'var(--table-row-alt)' : 'transparent'
+                }}
               >
-                <td className={`text-center ${isSpotlightTheme ? 'px-4 py-4 text-slate-400' : ''}`}>{index + 1}</td>
-                <td className={isSpotlightTheme ? 'px-4 py-4 font-medium text-white' : 'font-medium'}>{record.FullnameTHEmpl}</td>
-                <td className={isSpotlightTheme ? 'px-4 py-4 text-slate-300' : ''}>{record.MainOrgOrgShort || '-'}</td>
-                <td className={isSpotlightTheme ? 'px-4 py-4 text-cyan-300 font-medium' : ''}>{record.FullnameTH1 || '-'}</td>
-                <td className={isSpotlightTheme ? 'px-4 py-4 text-slate-300' : ''}>{record.FullnameTH2 || '-'}</td>
-                <td className={isSpotlightTheme ? 'px-4 py-4 text-slate-500' : ''}>{record.FullnameTH3 || '-'}</td>
-                <td className={isSpotlightTheme ? 'px-4 py-4 text-slate-300' : ''}>{record.EmplCode_AdminUpdateTH || '-'}</td>
-                <td className={isSpotlightTheme ? 'px-4 py-4 text-slate-400 text-sm' : ''}>{formatDate(record.UpdateDate)}</td>
+                <td className="text-center px-4 py-4" style={{ color: 'var(--text-muted)' }}>{index + 1}</td>
+                <td className="px-4 py-4 font-medium" style={{ color: 'var(--text-primary)' }}>{record.FullnameTHEmpl}</td>
+                <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.MainOrgOrgShort || '-'}</td>
+                <td className="px-4 py-4 font-medium" style={{ color: 'var(--table-text-accent)' }}>{record.FullnameTH1 || '-'}</td>
+                <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.FullnameTH2 || '-'}</td>
+                <td className="px-4 py-4" style={{ color: 'var(--text-muted)' }}>{record.FullnameTH3 || '-'}</td>
+                <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.EmplCode_AdminUpdateTH || '-'}</td>
+                <td className="px-4 py-4 text-sm" style={{ color: 'var(--text-muted)' }}>{formatDate(record.UpdateDate)}</td>
               </tr>
             ))
           )}
@@ -121,60 +118,50 @@ export default function ApprovalTable({ records, isSpotlightTheme = false }: App
       {/* Mobile Cards */}
       <div className="md:hidden">
         {sortedRecords.length === 0 ? (
-          <div className={`text-center py-8 ${isSpotlightTheme ? 'text-slate-500' : 'text-[var(--foreground-muted)]'}`}>
+          <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
             ไม่พบข้อมูล
           </div>
         ) : (
-          <div className={`divide-y ${isSpotlightTheme ? 'divide-white/10' : 'divide-[var(--border-color)]'}`}>
+          <div className="divide-y" style={{ borderColor: 'var(--table-border)' }}>
             {sortedRecords.map((record, index) => (
               <div 
                 key={record.id || index} 
-                className={`p-4 ${isSpotlightTheme 
-                  ? index % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'
-                  : index % 2 === 0 ? 'bg-white' : 'bg-[#fafbfc]'
-                }`}
+                className="p-4"
+                style={{ background: index % 2 === 0 ? 'var(--table-row-alt)' : 'transparent' }}
               >
                 <div className="flex justify-between items-start mb-3">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${isSpotlightTheme 
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' 
-                    : 'bg-[var(--primary-light)] text-[var(--primary)]'
-                  }`}>
+                  <span className="text-xs px-2.5 py-1 rounded-full font-medium"
+                    style={{ background: 'var(--accent-bg)', color: 'var(--accent)', border: '1px solid var(--accent-border)' }}>
                     #{index + 1}
                   </span>
                 </div>
-                <div className={`font-semibold mb-3 ${isSpotlightTheme ? 'text-white text-lg' : 'text-[var(--foreground)]'}`}>
+                <div className="font-semibold mb-3 text-lg" style={{ color: 'var(--text-primary)' }}>
                   {record.FullnameTHEmpl}
                 </div>
                 <div className="text-sm">
                   <div>
-                    <span className={`text-xs ${isSpotlightTheme ? 'text-slate-500' : 'text-[var(--foreground-muted)]'}`}>หน่วยงาน</span>
-                    <div className={isSpotlightTheme ? 'text-slate-300 mt-0.5' : 'text-[var(--foreground)]'}>{record.MainOrgOrgShort || '-'}</div>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>หน่วยงาน</span>
+                    <div className="mt-0.5" style={{ color: 'var(--table-text)' }}>{record.MainOrgOrgShort || '-'}</div>
                   </div>
                 </div>
-                <div className={`mt-3 pt-3 ${isSpotlightTheme ? 'border-t border-white/10' : 'border-t border-[var(--border-color)]'}`}>
-                  <div className={`text-xs mb-2 font-medium ${isSpotlightTheme ? 'text-slate-500' : 'text-[var(--foreground-muted)]'}`}>ผู้ประเมิน</div>
+                <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--table-border)' }}>
+                  <div className="text-xs mb-2 font-medium" style={{ color: 'var(--text-muted)' }}>ผู้ประเมิน</div>
                   <div className="flex flex-wrap gap-2">
                     {record.FullnameTH1 && (
-                      <span className={`px-2.5 py-1.5 rounded-lg text-xs ${isSpotlightTheme 
-                        ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 font-medium' 
-                        : 'bg-[#e0f2fe] text-[#0369a1]'
-                      }`}>
+                      <span className="px-2.5 py-1.5 rounded-lg text-xs font-medium"
+                        style={{ background: 'var(--accent-bg)', color: 'var(--table-text-accent)', border: '1px solid var(--accent-border)' }}>
                         1. {record.FullnameTH1}
                       </span>
                     )}
                     {record.FullnameTH2 && (
-                      <span className={`px-2.5 py-1.5 rounded-lg text-xs ${isSpotlightTheme 
-                        ? 'bg-slate-500/10 text-slate-400 border border-slate-500/20' 
-                        : 'bg-[#fef3c7] text-[#92400e]'
-                      }`}>
+                      <span className="px-2.5 py-1.5 rounded-lg text-xs"
+                        style={{ background: 'var(--surface-alt)', color: 'var(--table-text)', border: '1px solid var(--table-border)' }}>
                         2. {record.FullnameTH2}
                       </span>
                     )}
                     {record.FullnameTH3 && (
-                      <span className={`px-2.5 py-1.5 rounded-lg text-xs ${isSpotlightTheme 
-                        ? 'bg-slate-700/30 text-slate-500 border border-slate-600/20' 
-                        : 'bg-[#f3e8ff] text-[#7c3aed]'
-                      }`}>
+                      <span className="px-2.5 py-1.5 rounded-lg text-xs"
+                        style={{ background: 'var(--surface)', color: 'var(--text-muted)', border: '1px solid var(--table-border)' }}>
                         3. {record.FullnameTH3}
                       </span>
                     )}

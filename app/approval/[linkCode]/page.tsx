@@ -151,25 +151,25 @@ export default function ApprovalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen" style={{ background: `linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to))` }}>
       {/* Subtle grid pattern overlay */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(148%2C163%2C184%2C0.05)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')] pointer-events-none"></div>
+      <div className="absolute inset-0 pointer-events-none" style={{ opacity: 'var(--grid-opacity)', backgroundImage: `url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(148%2C163%2C184%2C1)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')` }}></div>
       
       <div className="relative w-full px-4 sm:px-6 md:w-[95%] lg:w-[90%] xl:max-w-6xl mx-auto py-8 md:py-12">
         {/* Header */}
         <div className="mb-8 md:mb-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-4">
-            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-            <span className="text-xs font-medium text-cyan-400 tracking-wide uppercase">Approval Portal</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4" style={{ background: 'var(--badge-bg)', border: '1px solid var(--badge-border)' }}>
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }}></div>
+            <span className="text-xs font-medium tracking-wide uppercase" style={{ color: 'var(--accent)' }}>Approval Portal</span>
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+          <h1 className="text-2xl md:text-4xl font-bold mb-3 tracking-tight" style={{ color: 'var(--text-primary)' }}>
             รายการผู้ประเมิน
           </h1>
           {approverInfo && (
-            <div className="text-slate-400 text-sm md:text-base">
-              <span className="text-white font-medium">{approverInfo.FullnameTH}</span>
+            <div className="text-sm md:text-base" style={{ color: 'var(--text-muted)' }}>
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{approverInfo.FullnameTH}</span>
               {approverInfo.MainPositionOrgShort && (
-                <span className="ml-2 text-slate-500">({approverInfo.MainPositionOrgShort})</span>
+                <span className="ml-2" style={{ color: 'var(--text-muted)' }}>({approverInfo.MainPositionOrgShort})</span>
               )}
               {/* Status Badge */}
               {approverInfo.ApproveStatus === 1 && (
@@ -200,34 +200,34 @@ export default function ApprovalPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 backdrop-blur-sm">
+          <div className="mb-6 p-4 rounded-xl backdrop-blur-sm" style={{ background: 'var(--error-bg)', border: '1px solid var(--error-border)' }}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--error-bg)' }}>
+                <svg className="w-5 h-5" style={{ color: 'var(--error-text)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <p className="text-red-300">{error}</p>
+              <p style={{ color: 'var(--error-text)' }}>{error}</p>
             </div>
           </div>
         )}
 
         {/* Success Message */}
         {success && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-sm">
+          <div className="mb-6 p-4 rounded-xl backdrop-blur-sm" style={{ background: 'var(--success-bg)', border: '1px solid var(--success-border)' }}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--success-bg)' }}>
+                <svg className="w-5 h-5" style={{ color: 'var(--success-text)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-emerald-300">{success}</p>
+              <p style={{ color: 'var(--success-text)' }}>{success}</p>
             </div>
           </div>
         )}
 
         {/* Content Card */}
-        <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden">
+        <div className="rounded-2xl backdrop-blur-xl shadow-2xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           {/* Card gradient border effect */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
           
@@ -235,14 +235,14 @@ export default function ApprovalPage() {
             {loading ? (
               <div className="py-16 text-center">
                 <div className="relative inline-block">
-                  <div className="w-12 h-12 rounded-full border-2 border-slate-700 border-t-cyan-400 animate-spin"></div>
-                  <div className="absolute inset-0 w-12 h-12 rounded-full bg-cyan-400/20 blur-xl"></div>
+                  <div className="w-12 h-12 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--spinner-border)', borderTopColor: 'var(--spinner-accent)' }}></div>
+                  <div className="absolute inset-0 w-12 h-12 rounded-full blur-xl" style={{ background: 'var(--spinner-glow)' }}></div>
                 </div>
-                <p className="mt-4 text-slate-400">กำลังโหลดข้อมูล...</p>
+                <p className="mt-4" style={{ color: 'var(--text-muted)' }}>กำลังโหลดข้อมูล...</p>
               </div>
             ) : (
               <>
-                <ApprovalTable records={records} isSpotlightTheme={true} />
+                <ApprovalTable records={records} />
 
                 {/* Approval Buttons */}
                 {records.length > 0 && !success && approverInfo?.ApproveStatus === 0 && (
@@ -293,7 +293,7 @@ export default function ApprovalPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-slate-500 text-xs">
+        <div className="mt-8 text-center text-xs" style={{ color: 'var(--text-footer)' }}>
           AOT Evaluator System
         </div>
       </div>

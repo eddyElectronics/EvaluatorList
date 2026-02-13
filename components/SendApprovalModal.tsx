@@ -122,29 +122,29 @@ export default function SendApprovalModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 relative">
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'var(--overlay-bg)' }}>
+      <div className="rounded-lg shadow-xl w-full max-w-md mx-4 relative" style={{ background: 'var(--modal-bg)', border: '1px solid var(--modal-border)' }}>
         {/* Progress Overlay */}
         {isSending && (
-          <div className="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-10 rounded-lg">
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 rounded-lg" style={{ background: 'var(--modal-bg)', opacity: 0.9 }}>
             <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-green-600 mb-3"></div>
-            <p className="text-gray-700 font-medium">กำลังส่งอนุมัติ...</p>
+            <p className="font-medium" style={{ color: 'var(--text-primary)' }}>กำลังส่งอนุมัติ...</p>
           </div>
         )}
 
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">ส่งอนุมัติ</h2>
+        <div className="px-6 py-4" style={{ borderBottom: '1px solid var(--modal-border)' }}>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--modal-header-text)' }}>ส่งอนุมัติ</h2>
         </div>
 
         <div className="px-6 py-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--modal-label-text)' }}>
               เลือกผู้อนุมัติ <span className="text-red-500">*</span>
             </label>
             {isLoadingEmployees ? (
-              <div className="flex items-center justify-center py-4 border border-gray-300 rounded-md bg-gray-50">
+              <div className="flex items-center justify-center py-4 rounded-md" style={{ border: '1px solid var(--input-border)', background: 'var(--input-bg)' }}>
                 <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2"></div>
-                <span className="text-gray-600 text-sm">กำลังโหลดรายชื่อ...</span>
+                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>กำลังโหลดรายชื่อ...</span>
               </div>
             ) : (
               <EmployeeAutocomplete
@@ -157,19 +157,20 @@ export default function SendApprovalModal({
           </div>
 
           {selectedApprover && (
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
+            <div className="p-3 rounded-lg" style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}>
+              <p className="text-sm" style={{ color: 'var(--accent-text)' }}>
                 รหัสผู้อนุมัติที่เลือก: <strong>{selectedApprover}</strong>
               </p>
             </div>
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+        <div className="px-6 py-4 flex justify-end gap-3" style={{ borderTop: '1px solid var(--modal-border)' }}>
           <button
             onClick={handleClose}
             disabled={isSending}
-            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+            style={{ color: 'var(--text-primary)', background: 'var(--surface-alt)' }}
           >
             ยกเลิก
           </button>

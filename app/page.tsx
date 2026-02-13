@@ -158,13 +158,13 @@ export default function Home() {
   // Show loading while checking auth
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: `linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to))` }}>
         <div className="text-center">
           <div className="relative inline-block">
-            <div className="w-12 h-12 rounded-full border-2 border-slate-700 border-t-cyan-400 animate-spin"></div>
-            <div className="absolute inset-0 w-12 h-12 rounded-full bg-cyan-400/20 blur-xl"></div>
+            <div className="w-12 h-12 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--spinner-border)', borderTopColor: 'var(--spinner-accent)' }}></div>
+            <div className="absolute inset-0 w-12 h-12 rounded-full blur-xl" style={{ background: 'var(--spinner-glow)' }}></div>
           </div>
-          <p className="mt-4 text-slate-400">กำลังตรวจสอบการเข้าสู่ระบบ...</p>
+          <p className="mt-4" style={{ color: 'var(--text-muted)' }}>กำลังตรวจสอบการเข้าสู่ระบบ...</p>
         </div>
       </div>
     );
@@ -172,11 +172,11 @@ export default function Home() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: `linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to))` }}>
         {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(148%2C163%2C184%2C0.05)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')] pointer-events-none"></div>
+        <div className="absolute inset-0 pointer-events-none" style={{ opacity: 'var(--grid-opacity)', backgroundImage: `url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(148%2C163%2C184%2C1)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')` }}></div>
         
-        <div className="relative rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl p-8 text-center max-w-md">
+        <div className="relative rounded-2xl backdrop-blur-xl p-8 text-center max-w-md" style={{ background: 'var(--login-card-bg)', border: '1px solid var(--card-border)', boxShadow: 'var(--login-card-shadow)' }}>
           {/* Card gradient border effect */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
           
@@ -197,19 +197,19 @@ export default function Home() {
               </svg>
             </div>
           </div>
-          <h1 className="text-2xl font-bold mb-2 text-white">
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             กำหนดรายชื่อผู้ประเมิน
           </h1>
-          <p className="mb-6 text-slate-400">
+          <p className="mb-6" style={{ color: 'var(--text-muted)' }}>
             กรุณาเข้าสู่ระบบด้วย Azure Entra ID
           </p>
           <button
             onClick={login}
             className="group relative w-full px-6 py-3 font-medium rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]"
           >
-            <div className="absolute inset-0 bg-white"></div>
-            <div className="absolute inset-0 bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <span className="relative flex items-center justify-center gap-3 text-slate-800">
+            <div className="absolute inset-0" style={{ background: 'var(--login-btn-bg)' }}></div>
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'var(--login-btn-hover)' }}></div>
+            <span className="relative flex items-center justify-center gap-3" style={{ color: 'var(--login-btn-text)' }}>
               <svg className="w-5 h-5" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
                 <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
                 <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
@@ -225,39 +225,41 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen" style={{ background: `linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to))` }}>
       {/* Subtle grid pattern overlay */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(148%2C163%2C184%2C0.05)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')] pointer-events-none"></div>
+      <div className="absolute inset-0 pointer-events-none" style={{ opacity: 'var(--grid-opacity)', backgroundImage: `url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Cdefs%3E%3Cpattern%20id%3D%22grid%22%20width%3D%2260%22%20height%3D%2260%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M%2060%200%20L%200%200%200%2060%22%20fill%3D%22none%22%20stroke%3D%22rgba(148%2C163%2C184%2C1)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20fill%3D%22url(%23grid)%22%20width%3D%22100%25%22%20height%3D%22100%25%22%2F%3E%3C%2Fsvg%3E')` }}></div>
       
       <div className="relative w-[90%] mx-auto py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-4">
-                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-                <span className="text-xs font-medium text-cyan-400 tracking-wide uppercase">Evaluator System</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4" style={{ background: 'var(--badge-bg)', border: '1px solid var(--badge-border)' }}>
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }}></div>
+                <span className="text-xs font-medium tracking-wide uppercase" style={{ color: 'var(--accent)' }}>Evaluator System</span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                 กำหนดรายชื่อผู้ประเมิน
               </h1>
             </div>
-            <Link
-              href="/admin"
-              className="group relative px-6 py-3 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <span className="relative">ตรวจสอบข้อมูล</span>
-            </Link>
+            {['494198', '483778', '483750', '545570', '484074'].includes(user?.employeeId || '') && (
+              <Link
+                href="/admin"
+                className="group relative px-6 py-3 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span className="relative">ตรวจสอบข้อมูล</span>
+              </Link>
+            )}
           </div>
-          <UserProfile isSpotlightTheme={true} />
+          <UserProfile />
         </div>
 
         {/* Warning and manual input if no employeeId */}
         {!user?.employeeId && (
-          <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-sm">
-            <p className="text-amber-300 mb-3">
+          <div className="mb-6 p-4 rounded-xl backdrop-blur-sm" style={{ background: 'var(--warning-bg)', border: '1px solid var(--warning-border)' }}>
+            <p className="mb-3" style={{ color: 'var(--warning-text)' }}>
               <strong>คำเตือน:</strong> ไม่พบรหัสพนักงาน (Employee ID) ในโปรไฟล์ของคุณ 
               กรุณาติดต่อผู้ดูแลระบบเพื่อเพิ่มข้อมูล Employee ID ใน Azure AD
             </p>
@@ -267,7 +269,8 @@ export default function Home() {
                 placeholder="กรอกรหัสพนักงาน (เช่น 23512)"
                 value={manualEmplCode}
                 onChange={(e) => setManualEmplCode(e.target.value)}
-                className="flex-1 max-w-xs px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+                className="flex-1 max-w-xs px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2"
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--input-text)', '--tw-ring-color': 'var(--accent)' } as React.CSSProperties}
               />
               <button
                 onClick={() => loadData(manualEmplCode)}
@@ -282,13 +285,13 @@ export default function Home() {
         )}
 
         {/* Content Card */}
-        <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden">
+        <div className="rounded-2xl backdrop-blur-xl shadow-2xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           {/* Card gradient border effect */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
           
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-white">รายการผู้ประเมิน</h2>
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>รายการผู้ประเมิน</h2>
               <div className="flex gap-3">
                 <button
                   onClick={() => loadData()}
@@ -323,19 +326,19 @@ export default function Home() {
             {loading ? (
               <div className="py-16 text-center">
                 <div className="relative inline-block">
-                  <div className="w-12 h-12 rounded-full border-2 border-slate-700 border-t-cyan-400 animate-spin"></div>
-                  <div className="absolute inset-0 w-12 h-12 rounded-full bg-cyan-400/20 blur-xl"></div>
+                  <div className="w-12 h-12 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--spinner-border)', borderTopColor: 'var(--spinner-accent)' }}></div>
+                  <div className="absolute inset-0 w-12 h-12 rounded-full blur-xl" style={{ background: 'var(--spinner-glow)' }}></div>
                 </div>
-                <p className="mt-4 text-slate-400">กำลังโหลดข้อมูล...</p>
+                <p className="mt-4" style={{ color: 'var(--text-muted)' }}>กำลังโหลดข้อมูล...</p>
               </div>
             ) : (
-              <EvaluatorTable records={records} onEdit={handleEdit} isSpotlightTheme={true} />
+              <EvaluatorTable records={records} onEdit={handleEdit} />
             )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-slate-500 text-xs">
+        <div className="mt-8 text-center text-xs" style={{ color: 'var(--text-footer)' }}>
           AOT Evaluator System
         </div>
       </div>

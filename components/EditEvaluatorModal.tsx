@@ -76,30 +76,30 @@ export default function EditEvaluatorModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4" style={{ borderRadius: '1rem' }}>
-        <div className="px-6 py-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--foreground)' }}>แก้ไขผู้ประเมิน</h2>
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'var(--overlay-bg)' }}>
+      <div className="rounded-xl shadow-2xl w-full max-w-2xl mx-4" style={{ borderRadius: '1rem', background: 'var(--modal-bg)', border: '1px solid var(--modal-border)' }}>
+        <div className="px-6 py-4" style={{ borderBottom: '1px solid var(--modal-border)' }}>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--modal-header-text)' }}>แก้ไขผู้ประเมิน</h2>
         </div>
 
         <div className="px-6 py-4 space-y-4">
           {/* ผู้ถูกประเมิน */}
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--modal-label-text)' }}>
               ผู้ถูกประเมิน
             </label>
             <input
               type="text"
               value={record.FullnameTHEmpl}
               disabled
-              className="w-full px-3 py-2 rounded-lg"
-              style={{ background: '#f8fafc', border: '1px solid var(--border-color)', color: 'var(--foreground-muted)' }}
+              className="w-full px-3 py-2 rounded-lg opacity-70"
+              style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--input-text)' }}
             />
           </div>
 
           {/* ผู้ประเมิน 1 */}
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--modal-label-text)' }}>
               ผู้ประเมิน 1
             </label>
             <EmployeeAutocomplete
@@ -112,7 +112,7 @@ export default function EditEvaluatorModal({
 
           {/* ผู้ประเมิน 2 */}
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--modal-label-text)' }}>
               ผู้ประเมิน 2
             </label>
             <EmployeeAutocomplete
@@ -125,7 +125,7 @@ export default function EditEvaluatorModal({
 
           {/* ผู้ประเมิน 3 */}
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--modal-label-text)' }}>
               ผู้ประเมิน 3
             </label>
             <EmployeeAutocomplete
@@ -137,19 +137,19 @@ export default function EditEvaluatorModal({
           </div>
         </div>
 
-        <div className="px-6 py-4 flex justify-end space-x-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+        <div className="px-6 py-4 flex justify-end space-x-3" style={{ borderTop: '1px solid var(--modal-border)' }}>
           <button
             onClick={onClose}
             disabled={isSaving}
-            className="btn"
-            style={{ background: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border-color)' }}
+            className="px-4 py-2 rounded-lg bg-transparent transition-colors"
+            style={{ color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
           >
             ปิด
           </button>
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="btn btn-primary"
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
           </button>
