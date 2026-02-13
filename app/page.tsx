@@ -19,13 +19,11 @@ export default function Home() {
   const [selectedRecord, setSelectedRecord] = useState<EvaluationRecord | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSendApprovalModalOpen, setIsSendApprovalModalOpen] = useState(false);
-  const [manualEmplCode, setManualEmplCode] = useState('');
 
   // Get CCTR from first record
   const cctr = records.length > 0 ? records[0].CCTR || '' : '';
 
-  // Get effective employee ID (from user profile or manual input)
-  const effectiveEmplCode = user?.employeeId || manualEmplCode;
+
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -37,7 +35,7 @@ export default function Home() {
   }, [isAuthenticated, user?.employeeId]);
 
   const loadData = async (emplCode?: string) => {
-    const codeToUse = emplCode || effectiveEmplCode;
+    const codeToUse = emplCode || user?.employeeId;
     if (!codeToUse) return;
 
     setLoading(true);
@@ -256,34 +254,6 @@ export default function Home() {
           <UserProfile />
         </div>
 
-        {/* Warning and manual input if no employeeId */}
-        {!user?.employeeId && (
-          <div className="mb-6 p-4 rounded-xl backdrop-blur-sm" style={{ background: 'var(--warning-bg)', border: '1px solid var(--warning-border)' }}>
-            <p className="mb-3" style={{ color: 'var(--warning-text)' }}>
-              <strong>คำเตือน:</strong> ไม่พบรหัสพนักงาน (Employee ID) ในโปรไฟล์ของคุณ 
-              กรุณาติดต่อผู้ดูแลระบบเพื่อเพิ่มข้อมูล Employee ID ใน Azure AD
-            </p>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                placeholder="กรอกรหัสพนักงาน (เช่น 23512)"
-                value={manualEmplCode}
-                onChange={(e) => setManualEmplCode(e.target.value)}
-                className="flex-1 max-w-xs px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2"
-                style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--input-text)', '--tw-ring-color': 'var(--accent)' } as React.CSSProperties}
-              />
-              <button
-                onClick={() => loadData(manualEmplCode)}
-                disabled={!manualEmplCode || loading}
-                className="group relative px-6 py-2.5 font-medium text-white rounded-lg overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600"></div>
-                <span className="relative">ค้นหา</span>
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Content Card */}
         <div className="rounded-2xl backdrop-blur-xl shadow-2xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           {/* Card gradient border effect */}
@@ -295,7 +265,7 @@ export default function Home() {
               <div className="flex gap-3">
                 <button
                   onClick={() => loadData()}
-                  disabled={loading || !effectiveEmplCode}
+                  disabled={loading || !user?.employeeId}
                   className="group relative px-4 py-2 font-medium text-white rounded-lg overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-cyan-600"></div>
@@ -304,7 +274,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setIsSendApprovalModalOpen(true)}
-                  disabled={loading || records.length === 0 || !effectiveEmplCode}
+                  disabled={loading || records.length === 0 || !user?.employeeId}
                   className="group relative px-4 py-2 font-medium text-white rounded-lg overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
@@ -350,7 +320,7 @@ export default function Home() {
           onClose={() => setIsModalOpen(false)}
           record={selectedRecord}
           employees={employees}
-          employeeId={effectiveEmplCode}
+          employeeId={user?.employeeId || ''}
           onSave={handleSave}
         />
       )}
@@ -360,7 +330,7 @@ export default function Home() {
         isOpen={isSendApprovalModalOpen}
         onClose={() => setIsSendApprovalModalOpen(false)}
         employees={employees}
-        employeeId={effectiveEmplCode}
+        employeeId={user?.employeeId || ''}
         cctr={cctr}
         onSuccess={() => loadData()}
         isLoadingEmployees={loadingEmployees}
