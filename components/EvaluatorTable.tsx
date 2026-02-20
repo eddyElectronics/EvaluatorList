@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { EvaluationRecord } from '@/lib/types';
 
 interface EvaluatorTableProps {
@@ -10,8 +10,14 @@ interface EvaluatorTableProps {
 
 type SortDirection = 'asc' | 'desc' | null;
 
+const ITEMS_PER_PAGE = 50;
+
 export default function EvaluatorTable({ records, onEdit }: EvaluatorTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset to page 1 when records change
+  useEffect(() => { setCurrentPage(1); }, [records]);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
@@ -43,6 +49,13 @@ export default function EvaluatorTable({ records, onEdit }: EvaluatorTableProps)
       }
     });
   }, [records, sortDirection]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedRecords.length / ITEMS_PER_PAGE));
+  const paginatedRecords = sortedRecords.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
   const handleSort = () => {
     if (sortDirection === null) {
@@ -87,14 +100,14 @@ export default function EvaluatorTable({ records, onEdit }: EvaluatorTableProps)
           </tr>
         </thead>
         <tbody>
-          {sortedRecords.length === 0 ? (
+          {paginatedRecords.length === 0 ? (
             <tr>
               <td colSpan={10} className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
                 ไม่พบข้อมูล
               </td>
             </tr>
           ) : (
-            sortedRecords.map((record, index) => (
+            paginatedRecords.map((record, index) => (
               <tr 
                 key={record.id}
                 className="transition-colors"
@@ -103,7 +116,7 @@ export default function EvaluatorTable({ records, onEdit }: EvaluatorTableProps)
                   background: index % 2 === 0 ? 'var(--table-row-alt)' : 'transparent'
                 }}
               >
-                <td className="text-center px-4 py-4" style={{ color: 'var(--text-muted)' }}>{index + 1}</td>
+                <td className="text-center px-4 py-4" style={{ color: 'var(--text-muted)' }}>{startIndex + index + 1}</td>
                 <td className="px-4 py-4 font-medium" style={{ color: 'var(--text-primary)' }}>{record.FullnameTHEmpl}</td>
                 <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.MainOrgOrgShort || '-'}</td>
                 <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.MainPositionOrgShort || '-'}</td>
@@ -126,6 +139,81 @@ export default function EvaluatorTable({ records, onEdit }: EvaluatorTableProps)
           )}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {sortedRecords.length > ITEMS_PER_PAGE && (
+        <div className="flex items-center justify-between px-4 py-4" style={{ borderTop: '1px solid var(--table-border)' }}>
+          <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            แสดง {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, sortedRecords.length)} จาก {sortedRecords.length} รายการ
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ color: 'var(--accent)', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
+            >
+              «
+            </button>
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ color: 'var(--accent)', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
+            >
+              ‹
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(page => {
+                if (totalPages <= 7) return true;
+                if (page === 1 || page === totalPages) return true;
+                if (Math.abs(page - currentPage) <= 1) return true;
+                return false;
+              })
+              .reduce<(number | string)[]>((acc, page, idx, arr) => {
+                if (idx > 0 && page - (arr[idx - 1] as number) > 1) acc.push('...');
+                acc.push(page);
+                return acc;
+              }, [])
+              .map((item, idx) =>
+                typeof item === 'string' ? (
+                  <span key={`dot-${idx}`} className="px-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>…</span>
+                ) : (
+                  <button
+                    key={item}
+                    onClick={() => setCurrentPage(item)}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                    style={
+                      item === currentPage
+                        ? { color: '#fff', background: 'var(--accent)' }
+                        : { color: 'var(--accent)', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }
+                    }
+                  >
+                    {item}
+                  </button>
+                )
+              )}
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ color: 'var(--accent)', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
+            >
+              ›
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ color: 'var(--accent)', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
+            >
+              »
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
