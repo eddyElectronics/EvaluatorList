@@ -102,6 +102,8 @@ export default function AdminPage() {
       'ผู้ประเมิน 1': record.FullnameTH1 || '-',
       'ผู้ประเมิน 2': record.FullnameTH2 || '-',
       'ผู้ประเมิน 3': record.FullnameTH3 || '-',
+      'ผู้อนุมัติ': record.ApproverName || '-',
+      'ตำแหน่งผู้อนุมัติ': record.ApproverPosition || '-',
       'ผู้บันทึก': record.EmplCode_AdminUpdateTH || '-',
       'เวลาบันทึก': record.UpdateDate ? new Date(record.UpdateDate).toLocaleString('th-TH') : '-',
     }));

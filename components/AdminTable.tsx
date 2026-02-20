@@ -80,6 +80,8 @@ export default function AdminTable({ records }: AdminTableProps) {
             <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้ประเมิน 1</th>
             <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้ประเมิน 2</th>
             <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้ประเมิน 3</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้อนุมัติ</th>
+            <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ตำแหน่งผู้อนุมัติ</th>
             <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>ผู้บันทึก</th>
             <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', background: 'var(--table-header-bg)' }}>เวลาบันทึก</th>
           </tr>
@@ -87,7 +89,7 @@ export default function AdminTable({ records }: AdminTableProps) {
         <tbody>
           {sortedRecords.length === 0 ? (
             <tr>
-              <td colSpan={9} className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
+              <td colSpan={11} className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
                 ไม่พบข้อมูล
               </td>
             </tr>
@@ -108,6 +110,8 @@ export default function AdminTable({ records }: AdminTableProps) {
                 <td className="px-4 py-4 font-medium" style={{ color: 'var(--table-text-accent)' }}>{record.FullnameTH1 || '-'}</td>
                 <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.FullnameTH2 || '-'}</td>
                 <td className="px-4 py-4" style={{ color: 'var(--text-muted)' }}>{record.FullnameTH3 || '-'}</td>
+                <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.ApproverName || '-'}</td>
+                <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.ApproverPosition || '-'}</td>
                 <td className="px-4 py-4" style={{ color: 'var(--table-text)' }}>{record.EmplCode_AdminUpdateTH || '-'}</td>
                 <td className="px-4 py-4 text-sm" style={{ color: 'var(--text-muted)' }}>{formatDate(record.UpdateDate)}</td>
               </tr>

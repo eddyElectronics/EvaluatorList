@@ -20,6 +20,8 @@ export interface EvaluationRecord {
   EmplCode_AdminUpdateTH?: string;
   UpdateDate?: string;
   CCTR?: string;
+  ApproverName?: string;
+  ApproverPosition?: string;
 }
 
 export interface EvaGetDataRequest {
