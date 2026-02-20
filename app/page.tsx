@@ -11,7 +11,7 @@ import Link from 'next/link';
 import * as XLSX from 'xlsx';
 
 export default function Home() {
-  const { isAuthenticated, user, login, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, user, login, logout, isLoading: authLoading } = useAuth();
   const [records, setRecords] = useState<EvaluationRecord[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
@@ -222,6 +222,58 @@ export default function Home() {
     );
   }
 
+  // Show loading while fetching user profile
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: `linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to))` }}>
+        <div className="text-center">
+          <div className="relative inline-block">
+            <div className="w-12 h-12 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--spinner-border)', borderTopColor: 'var(--spinner-accent)' }}></div>
+            <div className="absolute inset-0 w-12 h-12 rounded-full blur-xl" style={{ background: 'var(--spinner-glow)' }}></div>
+          </div>
+          <p className="mt-4" style={{ color: 'var(--text-muted)' }}>กำลังโหลดข้อมูลผู้ใช้...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to login if no employeeId
+  if (!user.employeeId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: `linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to))` }}>
+        <div className="relative rounded-2xl backdrop-blur-xl p-8 text-center max-w-md" style={{ background: 'var(--login-card-bg)', border: '1px solid var(--card-border)', boxShadow: 'var(--login-card-shadow)' }}>
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
+          <div className="mb-6">
+            <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600">
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+            ไม่พบรหัสพนักงาน
+          </h1>
+          <p className="mb-2" style={{ color: 'var(--text-muted)' }}>
+            บัญชี <strong>{user.displayName}</strong> ไม่มีรหัสพนักงาน (Employee ID) ในระบบ
+          </p>
+          <p className="mb-6 text-sm" style={{ color: 'var(--text-muted)' }}>
+            กรุณาติดต่อฝ่าย IT หรือลองเข้าสู่ระบบด้วยบัญชีอื่น
+          </p>
+          <button
+            onClick={logout}
+            className="group relative w-full px-6 py-3 font-medium rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]"
+          >
+            <div className="absolute inset-0" style={{ background: 'var(--login-btn-bg)' }}></div>
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'var(--login-btn-hover)' }}></div>
+            <span className="relative flex items-center justify-center gap-3" style={{ color: 'var(--login-btn-text)' }}>
+              กลับไปหน้าเข้าสู่ระบบ
+            </span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{ background: `linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to))` }}>
       {/* Subtle grid pattern overlay */}
@@ -240,7 +292,7 @@ export default function Home() {
                 กำหนดรายชื่อผู้ประเมิน
               </h1>
             </div>
-            {['494198', '483778', '483750', '545570', '484074'].includes(user?.employeeId || '') && (
+            {['494198', '483778', '483750', '545570', '484074', '670005'].includes(user?.employeeId || '') && (
               <Link
                 href="/admin"
                 className="group relative px-6 py-3 font-semibold text-white rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]"

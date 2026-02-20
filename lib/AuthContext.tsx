@@ -32,82 +32,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, user]);
 
   useEffect(() => {
-    // Check if access token changed
-    if (prevAccessTokenRef.current === session?.accessToken) {
-      return;
-    }
-    prevAccessTokenRef.current = session?.accessToken;
-
-    if (!isAuthenticated || !session?.accessToken) {
+    if (!isAuthenticated || !session?.user) {
       hasFetchedRef.current = false;
+      setUser(null);
       return;
     }
 
-    if (hasFetchedRef.current) {
+    // Check if session data changed
+    const currentToken = session.accessToken;
+    if (prevAccessTokenRef.current === currentToken && hasFetchedRef.current) {
       return;
     }
+    prevAccessTokenRef.current = currentToken;
+    hasFetchedRef.current = true;
+
+    // Use session data directly (already fetched server-side in JWT callback)
+    const sessionUser: UserProfile = {
+      id: '',
+      displayName: session.user.name || '',
+      jobTitle: session.user.jobTitle,
+      mail: session.user.email || undefined,
+      employeeId: session.user.employeeId,
+      photo: session.user.image || undefined,
+    };
+
+    setUser(sessionUser);
+
+    // Try to fetch photo separately (optional, may fail if token expired)
+    if (!currentToken) return;
 
     const controller = new AbortController();
 
-    const fetchUserProfile = async () => {
-      hasFetchedRef.current = true;
-
+    const fetchPhoto = async () => {
       try {
-        // Fetch user profile from MS Graph with employeeId
-        const response = await fetch('https://graph.microsoft.com/v1.0/me?$select=id,displayName,mail,jobTitle,employeeId', {
+        const photoResponse = await fetch('https://graph.microsoft.com/v1.0/me/photo/$value', {
           headers: {
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${currentToken}`,
           },
           signal: controller.signal,
         });
-
-        if (response.ok) {
-          const profile = await response.json();
-
-          // Fetch user photo
-          let photoUrl: string | undefined;
-          try {
-            const photoResponse = await fetch('https://graph.microsoft.com/v1.0/me/photo/$value', {
-              headers: {
-                Authorization: `Bearer ${session.accessToken}`,
-              },
-              signal: controller.signal,
-            });
-            if (photoResponse.ok) {
-              const blob = await photoResponse.blob();
-              photoUrl = URL.createObjectURL(blob);
-            }
-          } catch {
-            console.log('No photo available');
-          }
-
-          setUser({
-            id: profile.id,
-            displayName: profile.displayName,
-            jobTitle: profile.jobTitle,
-            mail: profile.mail,
-            employeeId: profile.employeeId || session.user?.employeeId,
-            photo: photoUrl,
-          });
+        if (photoResponse.ok) {
+          const blob = await photoResponse.blob();
+          const photoUrl = URL.createObjectURL(blob);
+          setUser(prev => prev ? { ...prev, photo: photoUrl } : prev);
         }
-      } catch (error) {
-        if ((error as Error).name === 'AbortError') return;
-        console.error('Error fetching user profile:', error);
-        // Fallback to session data
-        if (session?.user) {
-          setUser({
-            id: '',
-            displayName: session.user.name || '',
-            jobTitle: session.user.jobTitle,
-            mail: session.user.email || undefined,
-            employeeId: session.user.employeeId,
-            photo: session.user.image || undefined,
-          });
-        }
+      } catch {
+        // Photo fetch failed (token expired or no photo) - ignore
       }
     };
 
-    fetchUserProfile();
+    fetchPhoto();
 
     return () => {
       controller.abort();
