@@ -16,8 +16,12 @@ export default function EvaluatorTable({ records, onEdit }: EvaluatorTableProps)
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Reset to page 1 when records change
-  useEffect(() => { setCurrentPage(1); }, [records]);
+  // Only adjust page if current page is out of bounds (e.g. after deletion)
+  // Do NOT reset to page 1 on every records change — keeps user on same page after save
+  useEffect(() => {
+    const newTotalPages = Math.max(1, Math.ceil(records.length / ITEMS_PER_PAGE));
+    setCurrentPage(prev => (prev > newTotalPages ? newTotalPages : prev));
+  }, [records]);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
