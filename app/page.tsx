@@ -9,6 +9,7 @@ import SendApprovalModal from '@/components/SendApprovalModal';
 import { Employee, EvaluationRecord } from '@/lib/types';
 import Link from 'next/link';
 import * as XLSX from 'xlsx';
+import packageJson from '@/package.json';
 
 export default function Home() {
   const { isAuthenticated, user, login, logout, isLoading: authLoading } = useAuth();
@@ -286,7 +287,7 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4" style={{ background: 'var(--badge-bg)', border: '1px solid var(--badge-border)' }}>
                 <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }}></div>
-                <span className="text-xs font-medium tracking-wide uppercase" style={{ color: 'var(--accent)' }}>Evaluator System</span>
+                <span className="text-xs font-medium tracking-wide uppercase" style={{ color: 'var(--accent)' }}>Evaluator List v{packageJson.version}</span>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                 กำหนดรายชื่อผู้ประเมิน
@@ -364,7 +365,7 @@ export default function Home() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-xs" style={{ color: 'var(--text-footer)' }}>
-          AOT Evaluator System
+          AOT Evaluator List v{packageJson.version}
         </div>
       </div>
 

@@ -7,6 +7,7 @@ import AdminTable from '@/components/AdminTable';
 import { EvaluationRecord } from '@/lib/types';
 import Link from 'next/link';
 import * as XLSX from 'xlsx';
+import packageJson from '@/package.json';
 
 interface AdminOption {
   EmplCode_Admin: string;
@@ -284,7 +285,7 @@ export default function AdminPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-xs" style={{ color: 'var(--text-footer)' }}>
-          AOT Evaluator System
+          AOT Evaluator List v{packageJson.version}
         </div>
       </div>
     </div>

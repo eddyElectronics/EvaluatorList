@@ -294,7 +294,7 @@ export default function ApprovalPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-xs" style={{ color: 'var(--text-footer)' }}>
-          AOT Evaluator System
+          AOT Evaluator List
         </div>
       </div>
     </div>
