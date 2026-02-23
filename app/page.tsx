@@ -345,17 +345,20 @@ export default function Home() {
               </div>
             </div>
 
-            {loading ? (
-              <div className="py-16 text-center">
-                <div className="relative inline-block">
-                  <div className="w-12 h-12 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--spinner-border)', borderTopColor: 'var(--spinner-accent)' }}></div>
-                  <div className="absolute inset-0 w-12 h-12 rounded-full blur-xl" style={{ background: 'var(--spinner-glow)' }}></div>
+            <div className="relative">
+              {loading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl" style={{ background: 'var(--card-bg)', opacity: 0.85 }}>
+                  <div className="text-center">
+                    <div className="relative inline-block">
+                      <div className="w-12 h-12 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--spinner-border)', borderTopColor: 'var(--spinner-accent)' }}></div>
+                      <div className="absolute inset-0 w-12 h-12 rounded-full blur-xl" style={{ background: 'var(--spinner-glow)' }}></div>
+                    </div>
+                    <p className="mt-4" style={{ color: 'var(--text-muted)' }}>กำลังโหลดข้อมูล...</p>
+                  </div>
                 </div>
-                <p className="mt-4" style={{ color: 'var(--text-muted)' }}>กำลังโหลดข้อมูล...</p>
-              </div>
-            ) : (
+              )}
               <EvaluatorTable records={records} onEdit={handleEdit} />
-            )}
+            </div>
           </div>
         </div>
 
